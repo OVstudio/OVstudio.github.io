@@ -1,0 +1,332 @@
+
+
+/* Reset */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: Arial, sans-serif; background: #000; color: #fff; }
+
+/* --- Нижня картинка (hero--one) --- */
+.hero {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  backface-visibility: hidden;
+}
+
+/* Оверлей поверх першого фото (плавне затемнення) */
+.hero--one::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  will-change: opacity;
+  transition: opacity 1800ms cubic-bezier(.19,1,.22,1);
+}
+.darken-active .hero--one::after { opacity: 1; }
+.darken-2-active .hero--one::after {
+  background: rgba(0,0,0,0.85);
+  opacity: 1;
+}
+
+/* Невеликий паралакс + затемнення для першого фото */
+.hero--one {
+  will-change: transform, filter;
+  transform-origin: center top;
+  transition: transform 1800ms cubic-bezier(.19,1,.22,1), filter 1800ms cubic-bezier(.19,1,.22,1);
+}
+.reveal-active .hero--one {
+  transform: translate3d(0,-6%,0);
+  filter: brightness(0.96);
+}
+
+/* Паралакс на внутрішнє зображення */
+.hero--one img {
+  will-change: transform;
+  transition: transform 1800ms cubic-bezier(.19,1,.22,1);
+}
+.reveal-active .hero--one img {
+  transform: translate3d(0,-3%,0);
+}
+
+/* --- Маски --- */
+:root { --mask-size: clamp(220px, 55vmin, 720px); }
+
+/* Екранний контейнер масок */
+.mask {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 3;
+  will-change: transform, opacity;
+}
+
+/* Бокс маски */
+.mask__box {
+  position: fixed;
+  width: 1920px;
+  height: 100%;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  transform: translate3d(0, 100%, 0);
+  opacity: 1;
+  will-change: transform, opacity;
+  transition-property: transform, opacity;
+  transition-duration: 2900ms;
+  transition-timing-function: cubic-bezier(.19,1,.22,1);
+  background: #000;
+  position: relative;
+}
+
+/* Псевдо-оверлей всередині кожної маски */
+.mask__box::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1800ms cubic-bezier(.19,1,.22,1);
+  z-index: 2;
+}
+
+/* Внутрішній контейнер */
+.mask__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Фото в масці */
+.mask__inner img {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate3d(-50%, -30%, 0);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 3000ms cubic-bezier(.19,1,.22,1);
+  backface-visibility: hidden;
+}
+
+/* ===== Перша маска: поведінка при reveal-active ===== */
+.reveal-active .mask--one .mask__box {
+  transform: translate3d(0,0,0);
+}
+.reveal-active .mask--one .mask__inner img {
+  transform: translate3d(-50%, 0%, 0);
+}
+
+/* ===== При появі другої маски (reveal-2-active) копіюємо ефекти hero--one ===== */
+.reveal-2-active .mask--one .mask__box {
+  transform: translate3d(0,-6%,0);
+  filter: brightness(0.96);
+  transition: transform 1800ms cubic-bezier(.19,1,.22,1), filter 1800ms cubic-bezier(.19,1,.22,1);
+}
+.reveal-2-active .mask--one .mask__box::after { opacity: 1; }
+.reveal-2-active .mask--one .mask__inner img {
+  transform: translate3d(-50%, -3%, 0);
+  transition: transform 1800ms cubic-bezier(.19,1,.22,1);
+}
+
+/* --- Друга маска (mask--two) --- */
+.mask--two { z-index: 4; }
+
+.mask__inner--two img {
+  transform: translate3d(-50%, -36%, 0);
+  transition: transform 3000ms cubic-bezier(.19,1,.22,1);
+}
+.reveal-2-active .mask--two .mask__box { transform: translate3d(0,0,0); }
+.reveal-2-active .mask--two .mask__inner--two img { transform: translate3d(-50%, 0%, 0); }
+
+/* --- Третя маска (mask--three) --- */
+.mask--three { z-index: 5; }
+
+.mask__inner--three img {
+  transform: translate3d(-50%, -40%, 0);
+  transition: transform 3000ms cubic-bezier(.19,1,.22,1);
+}
+
+/* поява third mask */
+.reveal-3-active .mask--three .mask__box {
+  transform: translate3d(0,0,0);
+}
+.reveal-3-active .mask--three .mask__inner--three img {
+  transform: translate3d(-50%, 0%, 0);
+}
+
+/* коли третя маска активна — можна підкрутити ефекти для попередніх масок (match hero--one behavior) */
+.reveal-3-active .mask--two .mask__box {
+  transform: translate3d(0,-6%,0);
+  filter: brightness(0.96);
+  transition: transform 1800ms cubic-bezier(.19,1,.22,1), filter 1800ms cubic-bezier(.19,1,.22,1);
+}
+.reveal-3-active .mask--two .mask__box::after { opacity: 1; }
+.reveal-3-active .mask--two .mask__inner--two img {
+  transform: translate3d(-50%, -3%, 0);
+  transition: transform 1800ms cubic-bezier(.19,1,.22,1);
+}
+
+/* --- Spacer --- */
+.page-scroll-spacer { height: 240vh; } /* трохи довше щоб вистачило місця для 3х появ */
+
+/* --- Reduced Motion --- */
+@media (prefers-reduced-motion: reduce) {
+  .hero--one,
+  .mask__box,
+  .mask__box--two,
+  .mask__box--three,
+  .mask__inner,
+  .mask__inner--two img,
+  .mask__inner--three img,
+  .mask__inner img,
+  .hero--one::after {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .hero--one::after { opacity: 0 !important; }
+}
+
+/* --- Курсор --- */
+.cursor-circle {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 50px;
+  border: 1px solid rgba(255,255,255,0.95);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate3d(-50%, -50%, 0);
+  will-change: transform, opacity;
+  transition: opacity 160ms linear, transform 220ms linear;
+  background: transparent;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+/* Fonts (залиш ті, що в тебе) */
+@font-face {
+  font-family: "Questrial";
+  src: url("../fonts/Questrial-Regular.ttf") format("truetype");
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Lovelace";
+  src: url("../fonts/lovelace.woff2") format("woff2"),
+       url("../fonts/lovelace.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+}
+@font-face {
+  font-family: "Gladies";
+  src: url("../fonts/Gladies Regular.otf") format("opentype");
+  font-weight: 400;
+}
+
+/* розташування: знизу зліва з невеликим "внутрішнім" відступом */
+#blend-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: flex-start; /* по горизонталі: зліва */
+  align-items: flex-end;       /* по вертикалі: знизу */
+  padding: 37vh 2vw;            /* змінюй ці значення щоб підсунути текст */
+  pointer-events: none;
+  z-index: 2147483646;
+  background: transparent;
+  mix-blend-mode: difference;
+  -webkit-mix-blend-mode: difference;
+}
+
+/* сам текст: блочний, вирівнювання ліворуч, обмеження ширини щоб не вилазив за край */
+#blend-overlay p {
+  margin: 0;
+  color: #fff;
+  font-family: "Gladies","Questrial",Arial,sans-serif;
+  letter-spacing: 0.04em;
+  display: block;               /* дозволяє тексту займати доступну ширину */
+  background: transparent;
+  padding: 0;                   /* прибираємо внутрішні падінги */
+  text-align: left;
+  font-size: 120px !important;
+  line-height: 1.05;
+  max-width: calc(100% - 10vw); /* не дає тексту перелізти за правий край */
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+
+.c1  { font-family: "Gladies"; }
+.c2  { font-family: "Gladies"; }
+.c3  { font-family: "Lovelace";   font-style: italic; }
+.c4  { font-family: "Questrial"; }
+.c5  { font-family: "Questrial"; }
+
+.c6  { font-family: "Gladies"; }
+.c7  { font-family: "Gladies"; }
+.c8  { font-family: "Lovelace";   font-style: italic; }
+.c9  { font-family: "Questrial"; }
+.c10 { font-family: "Questrial"; }
+
+.c11 { font-family: "Gladies"; }
+.c12 { font-family: "Gladies"; }
+.c13  { font-family: "Lovelace";   font-style: italic; }
+.c14 { font-family: "Questrial"; }
+.c15 { font-family: "Questrial"; }
+
+.c16 { font-family: "Gladies"; }
+.c17 { font-family: "Lovelace";   font-style: italic; }
+.c18 { font-family: "Questrial"; }
+.c19 { font-family: "Questrial"; }
+
+.c20 { font-family: "Gladies"; }
+.c21 { font-family: "Lovelace";   font-style: italic; }
+.c22 { font-family: "Questrial"; }
+.c23 { font-family: "Questrial"; }
+
+
+
+
+
+/* Маленький підзаголовок під основним */
+.text2 {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  padding: 63vh 3vw;            /* змінюй ці значення щоб підсунути текст */
+  z-index: 2147483646;
+}
+
+.text2 p {
+  margin: 0;
+  color: #fff;
+  font-family: "Questrial";
+  letter-spacing: 0.04em;
+  display: block;               /* дозволяє тексту займати доступну ширину */
+  background: transparent;
+  padding: 0;                   /* прибираємо внутрішні падінги */
+  text-align: left;
+  font-size: 20px !important;
+
+}
